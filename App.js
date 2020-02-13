@@ -5,7 +5,6 @@ import Dashboard from './src/components/Dashboard';
 const App = () => {
   return (
     <View>
-      <Text>Hello again!!</Text>
       <Dashboard />
     </View>
   );
