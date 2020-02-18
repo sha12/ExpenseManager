@@ -1,35 +1,35 @@
 import SmsAndroid from 'react-native-get-sms-android';
+import {useState, useEffect} from 'react';
 
 const BankTitles = ['VMAxisBk', 'VKAxisBk', 'VMHDFCBK'];
+var currentTimeStamp = new Date().getTime();
+var todayStartTimestamp = new Date(currentTimeStamp).setHours(0, 0, 0);
 
-var totalSpends = 0;
+var testDate = new Date(2020, 1, 1, 0, 0, 0).getTime();
 
-const getSpends = async filters => {
-  console.log('above list');
+const useMessages = () => {
+  const [messages, setMessages] = useState([]);
 
-  await SmsAndroid.list(
-    JSON.stringify({minDate: filters.minDate, maxDate: filters.maxDate}),
+  const smsApi = async filters => {
+    await SmsAndroid.list(
+      JSON.stringify({
+        minDate: testDate,
+        maxDate: currentTimeStamp,
+        bodyRegex: '(.*)debited(.*)',
+      }),
+      err => {
+        console.log('Failed with error: ', err);
+      },
+      (count, smsList) => {
+        setMessages(JSON.parse(smsList));
+      },
+    );
+  };
 
-    err => {
-      console.log('Failed with error: ', err);
-    },
-
-    (count, smsList) => {
-      console.log('outer scopeeeeeeeeeeee', totalSpends);
-      JSON.parse(smsList).forEach(msg => {
-        if (BankTitles.includes(msg.address)) {
-          let rgxMatch = msg.body.match(/[RS|INR].?\s+(\d+.?\d{1,2})/i);
-          totalSpends += parseInt(rgxMatch[1], 10)
-            ? parseFloat(rgxMatch[1])
-            : 0;
-        }
-      });
-    },
-  );
-
-  console.log('okkkkk', totalSpends);
-
-  return 0;
+  useEffect(() => {
+    smsApi();
+  }, []);
+  return [smsApi, messages];
 };
 
-export default getSpends;
+export default useMessages;
