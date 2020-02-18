@@ -1,67 +1,60 @@
-import React, {useState, useEffect} from 'react';
-import {View, Text, PermissionsAndroid, Button} from 'react-native';
-import SmsAndroid from 'react-native-get-sms-android';
+import React, {useEffect, useState} from 'react';
+import {View, Text} from 'react-native';
+import requestSmsPermissions from '../permissions/ReadSms';
+import useMessages from '../api/Sms';
+import formatDate from '../common/Utils';
+import {AsyncStorage, AppState} from 'react-native';
+
+const BankTitles = ['HDFCBK', 'AxisBk'];
 
 const Dashboard = () => {
-  const [numberOfMessages, setNumberOfMessages] = useState(0);
+  console.log('rending app');
+  const [transactionData, setTransationData] = useState({});
+  const [smsApi, messages] = useMessages();
 
-  async function requestSmsPermissions() {
-    const checkPermission = await PermissionsAndroid.check(
-      PermissionsAndroid.PERMISSIONS.READ_SMS,
-    );
-    if (checkPermission) {
-      console.log('Read SMS Permission is already given');
-      return;
-    }
-    try {
-      console.log('Requesting Read SMS Permissions');
-      const granted = await PermissionsAndroid.request(
-        PermissionsAndroid.PERMISSIONS.READ_SMS,
-        {
-          title: 'EXPENSE MANAGER SMS Permission',
-          message: 'Expense Manager needs SMS Permission',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        },
-      );
-      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-        console.log('You have READ SMS Permissions');
-      } else {
-        console.log('READ SMS Permission denied.');
+  const checkMsgAddress = address => {
+    var status = false;
+    BankTitles.forEach(title => {
+      if (address.toLowerCase().includes(title.toLowerCase())) {
+        status = true;
       }
-    } catch (err) {
-      console.error(err);
-    }
-  }
+    });
+    return status;
+  };
+
+  const getSpends = () => {
+    const transactionDataClone = JSON.parse(JSON.stringify(transactionData));
+    messages.forEach(msg => {
+      if (checkMsgAddress(msg.address)) {
+        let rgxMatch = msg.body.match(/[RS|INR].?\s+([\d|,]+.?\d{1,2})/i);
+        if (rgxMatch) {
+          const spentDetails = {
+            amount: parseInt(rgxMatch[1], 10) ? parseFloat(rgxMatch[1]) : 0,
+            comment: msg.body,
+            spentFrom: msg.address,
+            spentAt: new Date(msg.date).toLocaleString(),
+          };
+          const msgDate = formatDate(msg.date);
+          if (msgDate in transactionDataClone) {
+            transactionDataClone[msgDate].push(spentDetails);
+          } else {
+            transactionDataClone[msgDate] = [spentDetails];
+          }
+        }
+      }
+    });
+  };
 
   useEffect(() => {
+    console.log('-------------');
     requestSmsPermissions();
+    getSpends();
   }, []);
-
-  const readSms = () => {
-    console.log('clicked');
-    console.log('Reading SMS');
-    SmsAndroid.list(
-      JSON.stringify({}),
-      err => {
-        console.log('Failed with error: ', err);
-      },
-      (count, smsList) => {
-        setNumberOfMessages(count);
-        console.log(count);
-        console.log(smsList.length);
-      },
-    );
-  };
 
   return (
     <View>
       <Text>Dashboard</Text>
-      {numberOfMessages ? (
-        <Text>You have {numberOfMessages} Messages in Inbox</Text>
-      ) : null}
-      <Button title="Click me" onPress={() => readSms()} />
+      <Text>Total spends: 0</Text>
     </View>
   );
 };

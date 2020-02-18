@@ -1,16 +1,21 @@
 import React from 'react';
-import {StyleSheet, View, Text} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import Dashboard from './src/components/Dashboard';
+import AllDaysSpends from './src/screens/AllDaysSpends';
 
 const App = () => {
   return (
-    <View>
-      <Text>Hello again!!</Text>
+    <View style={styles.viewStyle}>
       <Dashboard />
+      <AllDaysSpends />
     </View>
   );
 };
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  viewStyle: {
+    flex: 1,
+  },
+});
 
 export default App;
