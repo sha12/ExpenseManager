@@ -1,13 +1,13 @@
 import SmsAndroid from 'react-native-get-sms-android';
 import {useState, useEffect} from 'react';
 
-const BankTitles = ['VMAxisBk', 'VKAxisBk', 'VMHDFCBK'];
 var currentTimeStamp = new Date().getTime();
 var todayStartTimestamp = new Date(currentTimeStamp).setHours(0, 0, 0);
 
 var testDate = new Date(2020, 1, 1, 0, 0, 0).getTime();
 
 const useMessages = () => {
+  console.log('use messages called');
   const [messages, setMessages] = useState([]);
 
   const smsApi = async filters => {
@@ -29,7 +29,8 @@ const useMessages = () => {
   useEffect(() => {
     smsApi();
   }, []);
-  return [smsApi, messages];
+
+  return [messages, smsApi];
 };
 
 export default useMessages;
