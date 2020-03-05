@@ -4,7 +4,7 @@ const getData = async item => {
   try {
     const value = await AyncStorage.getItem(item);
     if (value !== null) {
-      console.log('the value is ', value);
+      console.log('the value of ', item, 'is', value);
     } else {
       console.log('its not stored', value);
     }
@@ -17,6 +17,7 @@ const getData = async item => {
 const putData = async (item, value) => {
   try {
     await AyncStorage.setItem(item, JSON.stringify(value));
+    console.log('Local Storage Data Stored', item, value);
   } catch (e) {
     console.log('error is storing data', e);
   }

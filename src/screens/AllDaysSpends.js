@@ -3,17 +3,16 @@ import {StyleSheet, FlatList, TouchableOpacity} from 'react-native';
 import DaySpends from './DaySpends';
 import Header from '../components/Header';
 
-const AllDaysSpends = () => {
-  const a = Array(30).fill({key: 2});
+const AllDaysSpends = ({spends}) => {
   return (
     <Fragment>
       <Header title="Expenses" />
       <FlatList
-        data={a}
-        keyExtractor={(item, index) => index.toString()}
+        data={spends}
+        keyExtractor={(item, index) => Object.keys(item)[0]}
         renderItem={itemData => (
           <TouchableOpacity onPress={() => console.log(itemData)}>
-            <DaySpends />
+            <DaySpends allDaySpends={itemData.item} />
           </TouchableOpacity>
         )}
         showsVerticalScrollIndicator={false}

@@ -35,6 +35,7 @@ const useSpends = () => {
               comment: msg.body,
               spentFrom: msg.address,
               spentAt: new Date(msg.date).toLocaleString(),
+              dateSent: msg.date_sent,
             };
             const msgDate = formatDate(msg.date);
             if (msgDate in transactionDataClone) {
@@ -45,7 +46,10 @@ const useSpends = () => {
           }
         }
       });
-      setTransactionsData(transactionDataClone);
+      const spends = Object.entries(transactionDataClone).map(e => ({
+        [e[0]]: e[1],
+      }));
+      setTransactionsData(spends);
     };
     getSpends();
   }, [messages]);

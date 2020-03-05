@@ -1,7 +1,17 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
 
-const daySpends = () => {
+const daySpends = ({allDaySpends}) => {
+  //console.log(allDaySpends);
+  //console.log(date);
+  const [spendsDetails] = [...Object.entries(allDaySpends)];
+  const [date, spends] = spendsDetails;
+
+  const totalDaySpends = spends.reduce(
+    (accumulator, item) => accumulator + item.amount,
+    0,
+  );
+
   var months = [
     'Jan',
     'Feb',
@@ -17,17 +27,10 @@ const daySpends = () => {
     'Dec',
   ];
 
-  const spends = 250;
-  const dateObj = new Date();
-  const formattedDate = [
-    dateObj.getDate(),
-    months[dateObj.getMonth()],
-    dateObj.getFullYear(),
-  ].join(' ');
   return (
     <View style={styles.viewStyle}>
-      <Text style={styles.dateStyle}>{formattedDate}</Text>
-      <Text style={styles.amountStyle}>Spends: {spends}</Text>
+      <Text style={styles.dateStyle}>{date}</Text>
+      <Text style={styles.amountStyle}>Spends: {totalDaySpends}</Text>
     </View>
   );
 };
